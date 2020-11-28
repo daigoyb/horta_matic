@@ -16,6 +16,17 @@ const Home = () => {
       });
   }
 
+  function getAirHumidity() {
+    database()
+      .ref('air_humidity')
+      .on('value', (snapshot) => {
+        if (snapshot.exists()) {
+          console.log('Data_AirHumidity: ', snapshot.val());
+          setAirHumidity(snapshot.val());
+        }
+      });
+  }
+
   function getLumen() {
     database()
       .ref('/lumen')
@@ -47,6 +58,17 @@ const Home = () => {
       });
   }
 
+  function getSoilHumidity() {
+    database()
+      .ref('/soil_humidity')
+      .on('value', (snapshot) => {
+        if (snapshot.exists()) {
+          console.log('Data_soilHumidity: ', snapshot.val());
+          setSoilHumidity(snapshot.val());
+        }
+      });
+  }
+
   function setLightOn() {
     database()
       .ref('/light')
@@ -63,13 +85,13 @@ const Home = () => {
 
   const [temperature, setTemperature] = useState(0);
   const [lumen, setLumen] = useState(0);
-  // const [initTime, setInitTime] = useState(new Date().getTime());
-  // const [endTime, setEndTime] = useState(new Date().getTime());
+  const [airHumidity, setAirHumidity] = useState(0);
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
   const [isLightOn, setIsLightOn] = useState({
     lightText: 'Ligado',
     iconType: 'bulb',
   });
+  const [soilHumidity, setSoilHumidity] = useState(0);
 
   const showDatePicker = () => {
     setDatePickerVisibility(true);
@@ -100,6 +122,13 @@ const Home = () => {
     }
   };
 
+  //airHumidity
+  useEffect(() => {
+    let mounted = true;
+    getAirHumidity();
+    return () => (mounted = false);
+  }, []);
+
   // temperatura
   useEffect(() => {
     let mounted = true;
@@ -121,6 +150,13 @@ const Home = () => {
     return () => (mounted = false);
   }, []);
 
+  //soilHumidity
+  useEffect(() => {
+    let mounted = true;
+    getSoilHumidity();
+    return () => (mounted = false);
+  }, []);
+
   return (
     <View style={styles.mainContainer}>
       <Text style={styles.mainTitle}>Data</Text>
@@ -130,15 +166,15 @@ const Home = () => {
       </View>
       <View style={styles.dataContainer}>
         <Icon name="water-outline" size={50} color="#7D4F56" />
-        <Text style={styles.DataText}>50 %</Text>
+        <Text style={styles.DataText}>{airHumidity} %</Text>
       </View>
       <View style={styles.dataContainer}>
         <Icon name="sunny-outline" size={50} color="#7D4F56" />
-        <Text style={styles.DataText}>{lumen} lm</Text>
+        <Text style={styles.DataText}>{lumen} Lux</Text>
       </View>
       <View style={styles.dataContainer}>
         <Icon name="flower-outline" size={50} color="#7D4F56" />
-        <Text style={styles.DataText}>80 %</Text>
+        <Text style={styles.DataText}>{soilHumidity} %</Text>
       </View>
       <View style={styles.lightBtnContainer}>
         <TouchableOpacity style={styles.lightBtn} onPress={handleLightClick}>
